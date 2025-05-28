@@ -1,0 +1,24 @@
+# Common ignores
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*~
+.env
+.env.local
+.env.production
+.env.staging
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Dependency directories
+node_modules/
+vendor/
+
+# Cache directories
+cache/
+tmp/

@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Card</title>
+		<style class="editorOnly">
+			:root {
+				interpolate-size: allow-keywords;
+				box-sizing: border-box;
+			}
+
+			body {
+				font-family: Arial, sans-serif;
+				margin: 0;
+				padding: 20px;
+				display: flex;
+				justify-content: center;
+				background-color: #333333;
+			}
+
+			.container {
+				display: flex;
+				gap: 40px;
+			}
+
+			.column {
+				width: 30rem;
+				min-height: 100%;
+				padding: 20px;
+				background-color: #222222;
+				border-radius: 8px;
+				box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+				position: relative;
+			}
+
+			button {
+				border: none;
+				background-color: #333333;
+				width: 100%;
+				height: 100%;
+				font-size: 36px;
+				color: white;
+				border-radius: 10px;
+				cursor: pointer;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				transition: background-color 0.3s;
+			}
+
+			.add-button {
+				color: black;
+				border: 5px dashed #ff8000;
+				background-color: #333333;
+			}
+
+			.download-button {
+				color: black;
+				border: none;
+				background-color: #ff8000;
+				margin-bottom: 8px;
+			}
+
+			.add-action-button {
+				width: 100%;
+				height: 100%;
+				font-size: 24px;
+				color: white;
+				border: 5px dashed #ff8000;
+				border-radius: 10px;
+				cursor: pointer;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				background-color: transparent;
+			}
+
+			.add-button:hover {
+				background-color: #dd6000;
+			}
+
+			.three-col {
+				display: grid;
+				grid-template-columns: auto auto 1fr;
+				gap: 10px;
+				align-items: center;
+				grid-area: span 1 / span 3;
+			}
+
+			.three-col.equal {
+				grid-template-columns: 1fr 1fr 1fr;
+			}
+
+			.three-col.dense {
+				grid-auto-flow: dense;
+			}
+
+			.left-element {
+				box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+				border-radius: 6px;
+				margin: 10px 0;
+				border-left: 4px solid #ff0000;
+				position: relative;
+			}
+
+			.left-element:has(.add-button),
+			.left-element:has(.download-button) {
+				border-left: 4px solid #ff8000;
+				cursor: default;
+			}
+
+			.grabber {
+				cursor: grab;
+			}
+
+			.grabber:active {
+				cursor: grabbing;
+			}
+
+			.grabber.dragging {
+				opacity: 0.8;
+				z-index: 10;
+			}
+
+			.templates {
+				display: none;
+			}
+
+			.editor {
+				margin-top: 10px;
+			}
+			.switch {
+			  position: relative;
+			  display: inline-block;
+			  width: 40px;
+			  height: 20px;
+			  background-color: rgba(255, 255, 255, 0.25);
+			  border-radius: 20px;
+			  transition: all 0.3s;
+			  grid-area: span 1 / span 2;
+			}
+			.switch::after {
+			  content: '';
+			  position: absolute;
+			  width: 18px;
+			  height: 18px;
+			  border-radius:50%;
+			  background-color: white;
+			  top: 1px;
+			  left: 1px;
+			  transition: all 0.3s;
+			}
+
+			.checkbox:checked + .switch::after {
+			  left : 20px;
+			}
+			.checkbox:checked + .switch {
+			  background-color: #ff8000;
+			}
+			.checkbox {
+			  display : none;
+			}
+		</style>
+		<style class="global">
+			body {
+				font-family: Arial, sans-serif;
+				margin: 0;
+				padding: 20px;
+				display: flex;
+				justify-content: center;
+				background-color: #333333;
+			}
+
+			.container {
+				display: flex;
+				gap: 40px;
+			}
+
+			.column {
+				max-width: 30rem;
+				width: 100vw;
+				min-height: 100%;
+				padding: 20px;
+				background-color: #222222;
+				border-radius: 8px;
+				box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+				margin: 0 auto;
+				position: relative;
+			}
+
+			.element {
+				padding: 15px;
+				background-color: black;
+				color: white;
+			}
+
+			.right-element {
+				text-align: center;
+			}
+
+			textarea {
+				grid-area: span 1 / span 3;
+				resize: vertical;
+				height: 4em;
+			}
+
+			input,
+			select {
+				grid-area: span 1 / span 2;
+			}
+
+			textarea,
+			input,
+			select,
+			.content-box {
+				box-sizing: border-box;
+				border-radius: 10px;
+				background-color: #333333;
+				border: none;
+				color: white;
+				outline: none;
+				padding: 10px;
+				width: calc(100%);
+				min-height: 1.5em;
+				font-family: Arial;
+			}
+
+			input[type="color"] {
+				min-height: 3em;
+				width: 100%;
+				padding: 3px;
+			}
+
+			.emoji {
+				height: 1em;
+				width: 1em;
+			}
+
+			.spoiler {
+				height: 0;
+				overflow: hidden;
+				transition: height 0.5s;
+			}
+
+			.spoiler.open {
+				height: auto;
+			}
+
+			table,
+			th,
+			td {
+				border: 1px solid rgba(0, 0, 0, 0.25);
+				border-collapse: collapse;
+			}
+
+			.action {
+				border-radius: 100%;
+				height: 32px;
+				width: 32px;
+				padding: 16px;
+				margin: 8px;
+			}
+
+			.action > img,
+			.action > svg {
+				width: 32px;
+				height: 32px;
+			}
+
+			.action-wrapper {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				flex: 1 0 30%;
+				margin-bottom:16px;
+			}
+
+			a {
+				text-decoration: none;
+				color: white;
+			}
+
+			.flex-container {
+				display: flex;
+				flex-wrap: wrap;
+			}
+
+			p > img {
+				height: 128px;
+			}
+
+			.whiten {
+				filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(49deg) brightness(105%) contrast(101%);
+			}
+			h1, h2, h3 { margin: 0; }
+			.button {
+				width: 100%;
+				color: white;
+				border-radius: 10px;
+				cursor: pointer;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				background-color: #ff8000;
+			}
+			a > div > p {
+				padding: 0;
+				margin: 0;
+			}
+			.cornerbuttons {
+				position: absolute;
+				top: 0;
+				right: 0;
+				cursor: pointer;
+				margin: 32px;
+				display: flex;
+			}
+			.cornerbuttons > div {
+				margin-left: 8px;
+			}
+			.cornerbuttons > div > img,
+			.cornerbuttons > div > svg	{
+				width: 24px;
+				height: 24px;
+			}
+			.qr-modal {
+				position:absolute;
+				height: 100%;
+				width: 100%;
+				background-color: black;
+				opacity: 0.75;
+				left: 0;
+				top: 0;
+				display: none;
+			}
+			.qr-modal > img,
+			.qr-modal > svg {
+				width: 80%;
+				height: unset;
+				margin: 10%;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="templates">
+			<div class="template" id="template-base">
+				<div class="grabber">X</div>
+				<div class="three-col">
+					Type:
+					<select onchange="updateTypeSelect(this);">
+						<option value="text">Text</option>
+						<option value="actionRow">Action Row</option>
+						<option value="image">Image</option>
+						<option value="spacing">Spacing</option>
+						<option value="content">Content</option>
+					</select>
+					<a href="#" onclick="handleSpoiler(this);" style="grid-area: span 1 / span 3">&#x25B6; More Options</a>
+					<div class="three-col spoiler">
+						Text Alignment:
+						<select onchange="document.getElementById({id}).style.textAlign = this.options[this.selectedIndex].value;">
+							<option value="left">Left</option>
+							<option value="center" selected>Center</option>
+							<option value="right">Right</option>
+						</select>
+						Background Color: <input type="color" oninput="document.getElementById({id}).style.backgroundColor = this.value;" /> Text Color:
+						<input type="color" value="#ffffff" oninput="document.getElementById({id}).style.color = this.value;" /> Height:
+						<input placeholder="Height in Pixels - 0 for Auto" value="0" oninput="document.getElementById({id}).style.height=this.value=='0'?'auto':this.value + 'px';" />
+					</div>
+				</div>
+				<div class="editor three-col"></div>
+			</div>
+			<div class="template" id="template-text-left">
+				<textarea oninput="document.getElementById({id}).innerHTML=parse(this.value);">
+# Supports Markdown
+And emojis! :ok_hand: :100:</textarea>
+			</div>
+			<div class="template" id="template-text-right">
+				<h1>Supports Markdown</h1>
+				<p>
+					And emojis! <img class="emoji" draggable="false" alt="👌" src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f44c.png" />
+					<img class="emoji" draggable="false" alt="💯" src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f4af.png" />
+				</p>
+			</div>
+			<div class="template" id="template-action">
+				<div class="action-editor three-col dense">
+					<select style="grid-area: unset" onchange="updateActionRow(this);">
+						<option value="none;#ffffff"></option>
+						<option value="remove;#ffffff">Remove</option>
+						<option value="custom;#ffffff">Custom</option>
+						<option value="none;#ffffff">------</option>
+						<option value="@envelope;#ff8000">Email</option>
+						<option value="@globe;#ff8000">Website</option>
+						<option value="@person;#ff8000">About</option>
+						<option value="none;#ffffff">------</option>
+						<option value="appstore;#0D96F6">App Store</option>
+						<option value="artstation;#13AFF0">ArtStation</option>
+						<option value="discord;#5865F2">Discord</option>
+						<option value="github;#181717">GitHub</option>
+						<option value="paypal;#003087">PayPal</option>
+						<option value="reddit;#FF4500">Reddit</option>
+						<option value="twitch;#9146FF">Twitch</option>
+						<option value="x;#000000">X / Twitter</option>
+						<option value="youtube;#FF0000">YouTube</option>
+						<option value="bluesky;#0285FF">BlueSky</option>
+						<option value="steam;#000000">Steam</option>
+						<option value="itchdotio;#FA5C5C">Itch.io</option>
+					</select>
+					<input placeholder="Link" style="grid-area: unset" oninput="updateActionRow(this);" />
+					<input placeholder="Text" style="grid-area: unset" oninput="updateActionRow(this);" />
+				</div>
+			</div>
+			<div class="template" id="template-actionRow-left">
+				<button class="add-action-button adder" onclick="this.nextElementSibling.appendChild(htmlToNode(document.getElementById('template-action').innerHTML));">+</button>
+				<div class="three-col"></div>
+			</div>
+			<div class="template" id="template-actionRow-right">
+				<div class="flex-container"></div>
+			</div>
+			<div class="template" id="template-image-left">URL: <input placeholder="URL" oninput="document.getElementById({id}).querySelector('img').src=this.value;" /></div>
+			<div class="template" id="template-image-right">
+				<img style="height: 100%" />
+			</div>
+			<div class="template" id="template-spacing-left"></div>
+			<div class="template" id="template-spacing-right"></div>
+			<div class="template" id="template-content-left">
+				<input type="color" oninput="document.getElementById({id}).querySelector('.content-box').style.backgroundColor=this.value;" value="#333333">
+				<input type="color" style="grid-area: unset" oninput="document.getElementById({id}).querySelector('.button').style.backgroundColor=this.value;" value="#ff8000">
+				<textarea oninput="document.getElementById({id}).querySelector('.text').innerHTML=parse(this.value);">
+# Supports Markdown
+And emojis! :ok_hand: :100:</textarea>
+				<input placeholder="Button Link" value="https://www.youtube.com/watch?v=dQw4w9WgXcQ" oninput="document.getElementById({id}).querySelector('.button').href=this.value;" />
+				<input placeholder="Button Text" value="Really cool button!" style="grid-area: unset" oninput="document.getElementById({id}).querySelector('.button').innerHTML=parse(this.value);" />
+			</div>
+			<div class="template" id="template-content-right">
+				<div class="content-box">
+					<div class="text"><h1>Supports Markdown</h1>
+					<p>And emojis! <img class="emoji" draggable="false" alt="👌" src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f44c.png"> <img class="emoji" draggable="false" alt="💯" src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f4af.png"></p>
+					</div>
+					<a class="button" target="_blank" href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">
+						<p>
+							Really cool button!
+						</p>
+					</a>
+				</div>
+			</div>
+		</div>
+		<div class="container">
+			<div class="column" id="left-column">
+				<div class="element left-element sticky-element" id="globals">
+					<div class="three-col">
+						Site Title: <input oninput="document.title=this.value;" />
+						Site Background: <input type="color" oninput="document.body.style.backgroundColor=this.value;" value="#333333">
+						Include Footer: <input type="checkbox" class="checkbox" id="toggle1" checked oninput="document.getElementById('footer').style.display=this.checked?'block':'none';">
+						<label for="toggle1" class="switch"></label>
+						Include Share Button: <input type="checkbox" class="checkbox" id="toggle2" checked oninput="document.getElementById('share').style.display=this.checked?'block':'none';">
+						<label for="toggle2" class="switch"></label>
+						Include QR Code Button: <input type="checkbox" class="checkbox" id="toggle3" checked oninput="document.getElementById('qr').style.display=this.checked?'block':'none';document.getElementById('qr2').style.display=this.checked?'grid':'none';">
+						<label for="toggle3" class="switch"></label>
+						<div id="qr2" class="three-col">QR Code URL: <input oninput="document.getElementById('qr-modal').querySelector('img').src='https://quickchart.io/qr?text='+encodeURIComponent(this.value)+'&format=svg&margin=0';"></div>
+					</div>
+				</div>
+				<div class="element left-element sticky-element">
+					<button class="add-button" id="add-button">+</button>
+				</div>
+				<div class="element left-element sticky-element">
+					<button class="download-button" onclick="downloadCurrentPageAsHTML();">Download HTML</button>
+					<button class="download-button" onclick="downloadJson();">Download JSON</button>
+					<div class="three-col"><input placeholder="URL / JSON" /><button onclick="document.importJson(this.previousElementSibling.value);">Import!</button>
+					<a class="button" href="https://pan.codes/" target="_blank"><p style="color:black;">See Example Page</p></a> or <a class="button" onclick="document.importJson('https://pan.codes/')"><p style="color:black;">Import It!</p></a>
+					</div>
+				</div>
+			</div>
+			<div class="column" id="right-column">
+				<div class="element right-element sticky-element" id="footer">
+					Made with <a href="https://card.pan.codes/" target="_blank"><u>card.pan.codes</u></a>
+				</div>
+				<div class="cornerbuttons">
+					<div id="qr" onclick="document.getElementById('qr-modal').style.display='block';">
+						<img src="https://unpkg.com/bootstrap-icons/icons/qr-code.svg" class="whiten">
+					</div>
+					<div id="share" onclick="navigator.share({title: document.title,url: window.location.href});">
+						<img src="https://unpkg.com/bootstrap-icons/icons/share.svg" class="whiten">
+					</div>
+				</div>
+				<div id="qr-modal" class="qr-modal" onclick="this.style.display='none';">
+					<img src="https://quickchart.io/qr?text=test&format=svg&margin=0">
+				</div>
+			</div>
+		</div>
+		<script class="editorOnly">
+			function httpGet(theUrl) {
+				var xmlHttp = new XMLHttpRequest();
+				xmlHttp.open("GET", theUrl, false); // false for synchronous request
+				xmlHttp.send(null);
+				return xmlHttp.responseText;
+			}
+			async function convertImageTags(doc) {
+				const parser = new DOMParser();
+				const imgTags = doc.querySelectorAll("img");
+				// Process each img tag
+				const conversionPromises = Array.from(imgTags).map(async (img) => {
+					let src = img.getAttribute("src");
+					src = "https://corsproxy.io/?url=" + encodeURIComponent(src);
+					// Skip if not an external URL
+					if (!src || src.startsWith("data:") || src.startsWith("#")) {
+						return Promise.resolve();
+					}
+					try {
+						// Fetch the image
+						const response = await fetch(src);
+						if (!response.ok) {
+							console.error(`Failed to fetch image from ${src}: ${response.status} ${response.statusText}`);
+							return Promise.resolve();
+						}
+						// Get content type from response
+						const contentType = response.headers.get("Content-Type");
+						if (contentType && contentType.includes("svg")) {
+							// Handle SVG - convert to inline SVG
+							const svgText = await response.text();
+							const svgDoc = parser.parseFromString(svgText, "image/svg+xml");
+							const svgElement = svgDoc.querySelector("svg");
+							if (svgElement) {
+								// Copy attributes from img to svg
+								if (img.hasAttribute("width")) svgElement.setAttribute("width", img.getAttribute("width"));
+								if (img.hasAttribute("height")) svgElement.setAttribute("height", img.getAttribute("height"));
+								if (img.hasAttribute("class")) svgElement.setAttribute("class", img.getAttribute("class"));
+								if (img.hasAttribute("id")) svgElement.setAttribute("id", img.getAttribute("id"));
+								if (img.hasAttribute("alt")) svgElement.setAttribute("aria-label", img.getAttribute("alt"));
+								// Replace img with svg
+								img.parentNode.replaceChild(svgElement, img);
+							}
+						} else {
+							// Handle other image types - convert to data URL
+							const blob = await response.blob();
+							return new Promise((resolve) => {
+								const reader = new FileReader();
+								reader.onloadend = () => {
+									img.src = reader.result;
+									resolve();
+								};
+								reader.readAsDataURL(blob);
+							});
+						}
+					} catch (error) {
+						console.error(`Error processing image ${src}:`, error);
+						return Promise.resolve();
+					}
+				});
+				// Wait for all conversions to complete
+				await Promise.all(conversionPromises);
+				// Return the modified HTML
+				return doc;
+			}
+			async function downloadJson() {
+				var json = document.makeJson();
+				const blob = new Blob([json], {
+					type: "application/json",
+				});
+				// Create a URL for the Blob
+				const url = URL.createObjectURL(blob);
+				// Create a temporary link to trigger the download
+				const link = document.createElement("a");
+				link.href = url;
+				link.download = document.title ? document.title + ".json" : "page.json";
+				document.body.appendChild(link);
+				link.click();
+				// Clean up
+				setTimeout(() => {
+					document.body.removeChild(link);
+					URL.revokeObjectURL(url);
+				}, 100);
+			}
+			async function downloadCurrentPageAsHTML() {
+				var json = document.makeJson();
+				// Clone the current document to avoid modifying the live DOM
+				let documentClone = document.cloneNode(true);
+				var leftCol = documentClone.getElementById("left-column");
+				leftCol.parentElement.removeChild(leftCol);
+				var templates = documentClone.querySelector(".templates");
+				templates.parentElement.removeChild(templates);
+				var editorOnly = documentClone.querySelectorAll(".editorOnly");
+				editorOnly.forEach((x) => x.parentElement.removeChild(x));
+				var style = documentClone.querySelector("style");
+				style.innerHTML += "body{padding:0;}.column{padding:0;}.cornerbuttons{margin:12px;}";
+				<!-- documentClone.getElementById("footer").style.display = null; -->
+				documentClone = await convertImageTags(documentClone);
+				const htmlElement = documentClone.documentElement;
+				var htmlContent = "<!DOCTYPE html>\n" + htmlElement.outerHTML;
+				htmlContent += "<!--Editor JSON values for possible reimport:" + json + "-->";
+				const blob = new Blob([htmlContent], {
+					type: "text/html",
+				});
+				// Create a URL for the Blob
+				const url = URL.createObjectURL(blob);
+				// Create a temporary link to trigger the download
+				const link = document.createElement("a");
+				link.href = url;
+				link.download = document.title ? document.title + ".html" : "page.html";
+				document.body.appendChild(link);
+				link.click();
+				// Clean up
+				setTimeout(() => {
+					document.body.removeChild(link);
+					URL.revokeObjectURL(url);
+				}, 100);
+			}
+		</script>
+		<script type="module" class="editorOnly">
+			import { marked, Marked } from "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js";
+			import customHeadingId from "https://cdn.jsdelivr.net/npm/marked-custom-heading-id/src/index.js";
+			import extendedTables from "https://cdn.jsdelivr.net/gh/calculuschild/marked-extended-tables/src/index.js";
+			import markedMoreLists from "https://cdn.jsdelivr.net/npm/marked-more-lists/src/index.js";
+			import { baseUrl } from "https://cdn.jsdelivr.net/npm/marked-base-url/src/index.js";
+			import { emojify } from "https://esm.sh/node-emoji";
+			import twemoji from "https://esm.sh/twemoji";
+
+			let markedInst = null;
+			document.makeJson = function () {
+				var elements = document.querySelectorAll(".left-element:not(.sticky-element), #globals");
+				var arr = [];
+				for (var el of elements) {
+					var arr2 = [];
+					var inputs = el.querySelectorAll("input, textarea, select");
+					for (var input of inputs) {
+						if(input.type == "checkbox")
+							arr2.push(input.checked);
+						else
+							arr2.push(input.value);
+					}
+					arr.push(arr2);
+				}
+				return JSON.stringify(arr);
+			};
+			document.importJson = function (json) {
+				console.log("importing: " + json);
+				if (json.startsWith("http")) {
+					var html = httpGet("https://corsproxy.io/?url=" + encodeURIComponent(json));
+					json = html.split("reimport:")[1];
+					json = json.substring(0, json.length - 3);
+					document.importJson(json);
+					return;
+				}
+				document.querySelectorAll(".element:not(.sticky-element)").forEach((x) => x.parentElement.removeChild(x));
+				var arr = JSON.parse(json);
+				let c = 0;
+				for (var el of arr) {
+					let left = null;
+					if (c == 0) {
+						left = document.getElementById("globals");
+					} else {
+						left = document.createColElement();
+					}
+					let i = 0;
+					for (var input of el) {
+						var inputAtIndex = left.querySelectorAll("input, textarea, select")[i];
+						if (!inputAtIndex) {
+							left.querySelector(".adder").click();
+							inputAtIndex = left.querySelectorAll("input, textarea, select")[i];
+						}
+						if(inputAtIndex.type == "checkbox")
+							inputAtIndex.checked = input;
+						else
+							inputAtIndex.value = input;
+						inputAtIndex.dispatchEvent(new Event("input"));
+						inputAtIndex.dispatchEvent(new Event("change"));
+						i++;
+					}
+					c++;
+				}
+			};
+			document.parse = function (text) {
+				if (!markedInst) return text;
+				return twemoji.parse(markedInst.parse(emojify(text)), { base: "https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/" });
+			};
+			document.handleSpoiler = function (button) {
+				var sib = button.nextElementSibling;
+				sib.classList.toggle("open");
+
+				// Optional: Update the arrow icon
+				if (sib.classList.contains("open")) {
+					button.innerHTML = "&#x25BC; More Options"; // Down arrow
+				} else {
+					button.innerHTML = "&#x25B6; More Options"; // Right arrow
+				}
+			};
+
+			function getTemplateBase(uniqueId) {
+				return document.getElementById("template-base").innerHTML.replaceAll("{id}", "'" + uniqueId + "-right" + "'");
+			}
+
+			function getTemplateLeft(name, uniqueId) {
+				return document.getElementById("template-" + name + "-left").innerHTML.replaceAll("{id}", "'" + uniqueId + "-right" + "'");
+			}
+
+			function getTemplateRight(name, uniqueId) {
+				return document.getElementById("template-" + name + "-right").innerHTML;
+			}
+
+			document.updateTypeSelect = function (select) {
+				let id = select.parentElement.parentElement.getAttribute("data-pair-id");
+				let temp = select.options[select.selectedIndex].value;
+				console.log("changing " + id + " to " + temp);
+				select.parentElement.parentElement.querySelector(".editor").innerHTML = getTemplateLeft(temp, id);
+				document.getElementById(id + "-right").innerHTML = getTemplateRight(temp, id);
+			};
+			const updateTypeSelect = document.updateTypeSelect;
+			document.updateActionRow = function (el) {
+				let element = el.parentElement.parentElement.parentElement.parentElement;
+				let id = element.getAttribute("data-pair-id");
+				var el2 = document.getElementById(id + "-right").querySelector("div");
+				el2.innerHTML = "";
+				for (let obj of element.querySelectorAll(".action-editor")) {
+					let index = obj.querySelector("select").selectedIndex;
+					let value = obj.querySelector("select").options[index].value;
+					let slug = value.split(";")[0];
+					let color = value.split(";")[1];
+					var link = obj.querySelectorAll("input")[0].value;
+					var text = obj.querySelectorAll("input")[1].value;
+					if (slug == "custom") {
+						var select = obj.querySelector("select");
+						if (select.style.display != "none") {
+							select.style.display = "none";
+							var newInput = document.createElement("input");
+							newInput.placeholder = "Slug";
+							newInput.oninput = obj.querySelector("input").oninput;
+							select.after(newInput);
+							var newColor = document.createElement("input");
+							newColor.type = "color";
+							newColor.oninput = newInput.oninput;
+							newInput.after(newColor);
+						}
+						var input = select.nextElementSibling;
+						slug = input.value;
+						var input2 = input.nextElementSibling;
+						color = input2.value;
+						var input3 = input2.nextElementSibling;
+						link = input3.value;
+						var input4 = input3.nextElementSibling;
+						text = input4.value;
+					}
+					text = document.parse(text);
+					if (slug == "remove") {
+						obj.parentElement.removeChild(obj);
+						document.updateActionRow(el);
+					}
+					let newEl = document.createElement("a");
+					newEl.className = "action-wrapper";
+					if (link.length > 0) newEl.href = link;
+					newEl.target = "_blank";
+					el2.appendChild(newEl);
+					let newEl2 = document.createElement("div");
+					newEl2.className = "action";
+					newEl2.innerHTML = '<img src="https://cdn.simpleicons.org/' + slug + '/white">';
+					if (slug.startsWith("@")) newEl2.innerHTML = '<img src="https://unpkg.com/bootstrap-icons/icons/' + slug.substring(1) + '.svg" class="whiten">';
+					newEl2.style.backgroundColor = color;
+					let newEl3 = document.createElement("div");
+					newEl3.innerHTML = text;
+					newEl.appendChild(newEl2);
+					newEl.appendChild(newEl3);
+				}
+			};
+			document.htmlToNode = function (html) {
+				const template = document.createElement("template");
+				template.innerHTML = html;
+				return template.content;
+			};
+			document.addEventListener("DOMContentLoaded", function () {
+				markedInst = setupMarked();
+
+				const addButton = document.getElementById("add-button");
+				const leftColumn = document.getElementById("left-column");
+				const rightColumn = document.getElementById("right-column");
+				const footer = document.getElementById("footer");
+				let elementCount = 0;
+
+				function createColElement() {
+					// Generate a unique ID for the new pair of elements
+					const uniqueId = "element-" + elementCount;
+					elementCount++;
+
+					// Create left column element
+					const leftElement = document.createElement("div");
+					leftElement.className = "element left-element";
+					leftElement.id = uniqueId + "-left";
+					leftElement.innerHTML = getTemplateBase(uniqueId);
+					leftElement.setAttribute("data-pair-id", uniqueId);
+					leftElement.draggable = true;
+
+					// Create right column element
+					const rightElement = document.createElement("div");
+					rightElement.className = "element right-element";
+					rightElement.id = uniqueId + "-right";
+					rightElement.innerHTML = getTemplateRight("text", uniqueId);
+					rightElement.setAttribute("data-pair-id", uniqueId);
+
+					// Add the elements to their respective columns
+					leftColumn.insertBefore(leftElement, addButton.parentElement);
+					rightColumn.insertBefore(rightElement, footer);
+
+					// Set up drag events for the new element
+					setupDragEvents(leftElement);
+					updateTypeSelect(leftElement.querySelector("select"));
+					return leftElement;
+				}
+				document.createColElement = createColElement;
+				addButton.addEventListener("click", createColElement);
+
+				// Set up column event listeners for drag and drop
+				leftColumn.addEventListener("dragover", handleDragOver);
+				leftColumn.addEventListener("drop", handleDrop);
+
+				let draggedElement = null;
+
+				// Initialize drag-and-drop functionality
+				function setupDragEvents(element) {
+					element.addEventListener("dragstart", handleDragStart);
+					element.addEventListener("dragend", handleDragEnd);
+				}
+
+				function handleDragStart(e) {
+					draggedElement = this;
+					this.classList.add("dragging");
+
+					// Required for Firefox
+					e.dataTransfer.effectAllowed = "move";
+					e.dataTransfer.setData("text/plain", this.id);
+				}
+
+				function handleDragEnd(e) {
+					this.classList.remove("dragging");
+					draggedElement = null;
+				}
+
+				function handleDragOver(e) {
+					e.preventDefault(); // Necessary to allow dropping
+					e.dataTransfer.dropEffect = "move";
+
+					const targetElement = getDragAfterElement(leftColumn, e.clientY);
+					if (targetElement) {
+						leftColumn.insertBefore(draggedElement, targetElement);
+					} else {
+						leftColumn.appendChild(draggedElement);
+					}
+
+					// Reorder the right side to match
+					reorderRightColumn();
+				}
+
+				function handleDrop(e) {
+					e.preventDefault();
+					// The actual reordering happens in dragOver
+					reorderRightColumn();
+				}
+
+				function getDragAfterElement(container, y) {
+					// Get all elements that are not being dragged
+					const draggableElements = [...container.querySelectorAll(".left-element:not(.dragging)")];
+
+					// Find the element we're dragging after based on cursor position
+					return draggableElements.reduce(
+						(closest, child) => {
+							const box = child.getBoundingClientRect();
+							const offset = y - box.top - box.height / 2;
+
+							// If offset is negative but greater than closest so far
+							if (offset < 0 && offset > closest.offset) {
+								return {
+									offset: offset,
+									element: child,
+								};
+							} else {
+								return closest;
+							}
+						},
+						{
+							offset: Number.NEGATIVE_INFINITY,
+						},
+					).element;
+				}
+
+				function reorderRightColumn() {
+					// Get all left elements in current order
+					const leftElements = Array.from(leftColumn.querySelectorAll(".left-element"));
+
+					// Reorder right elements to match
+					leftElements.forEach((leftEl) => {
+						const pairId = leftEl.getAttribute("data-pair-id");
+						if (!pairId) return;
+						const rightEl = document.querySelector(`.right-element[data-pair-id="${pairId}"]`);
+						if (rightEl) {
+							rightColumn.appendChild(rightEl);
+						}
+					});
+					rightColumn.appendChild(footer);
+				}
+				function setupMarked() {
+					let markedInstance = new Marked({ breaks: true }, customHeadingId(), extendedTables(), markedMoreLists(), baseUrl("https://example.com/folder/"));
+					return markedInstance;
+				}
+			});
+		</script>
+	</body>
+</html>
