@@ -60,6 +60,7 @@
 				border: none;
 				background-color: #ff8000;
 				margin-bottom: 8px;
+				display:inline;
 			}
 
 			.add-action-button {
@@ -346,7 +347,12 @@
 	<body>
 		<div class="templates">
 			<div class="template" id="template-base">
-				<div class="grabber">X</div>
+				<span class="grabber"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-grip-vertical" viewBox="0 0 16 16">
+					<path d="M7 2a1 1 0 1 1-2 0 1 1 0 0 1 2 0m3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0M7 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0m3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0M7 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0m3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0m-3 3a1 1 0 1 1-2 0 1 1 0 0 1 2 0m3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0m-3 3a1 1 0 1 1-2 0 1 1 0 0 1 2 0m3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/>
+				</svg></span>
+				<span class="trash" onclick="deleteColElement(this.parentElement)" style="cursor:pointer;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
+					<path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"/>
+				</svg></span>
 				<div class="three-col">
 					Type:
 					<select onchange="updateTypeSelect(this);">
@@ -465,8 +471,8 @@ And emojis! :ok_hand: :100:</textarea>
 					<button class="add-button" id="add-button">+</button>
 				</div>
 				<div class="element left-element sticky-element">
-					<button class="download-button" onclick="downloadCurrentPageAsHTML();">Download HTML</button>
-					<button class="download-button" onclick="downloadJson();">Download JSON</button>
+					<button class="download-button" style="width:89%" onclick="downloadCurrentPageAsHTML();">Download HTML</button> <button onclick="downloadCurrentPageAsHTML(true);" class="download-button" style="width:10%;"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-box-arrow-up-right" viewBox="-1 -1 18 18"><path fill-rule="evenodd" d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5"  stroke="currentColor" stroke-width="0.8"/><path fill-rule="evenodd" d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0z" stroke="currentColor" stroke-width="0.8"/></svg></button>
+					<button class="download-button" style="width:89%" onclick="downloadJson();">Download JSON</button> <button onclick="downloadJson(true);" class="download-button" style="width:10%;"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-box-arrow-up-right" viewBox="-1 -1 18 18"><path fill-rule="evenodd" d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5"  stroke="currentColor" stroke-width="0.8"/><path fill-rule="evenodd" d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0z" stroke="currentColor" stroke-width="0.8"/></svg></button>
 					<div class="three-col"><input placeholder="URL / JSON" /><button onclick="document.importJson(this.previousElementSibling.value);">Import!</button>
 					<a class="button" href="https://pan.codes/" target="_blank"><p style="color:black;">See Example Page</p></a> or <a class="button" onclick="document.importJson('https://pan.codes/')"><p style="color:black;">Import It!</p></a>
 					</div>
@@ -485,7 +491,7 @@ And emojis! :ok_hand: :100:</textarea>
 					</div>
 				</div>
 				<div id="qr-modal" class="qr-modal" onclick="this.style.display='none';">
-					<img src="https://quickchart.io/qr?text=test&format=svg&margin=0">
+					<img src="https://quickchart.io/qr?text=test&format=svg&margin=0&dark=ffffff&light=000000">
 				</div>
 			</div>
 		</div>
@@ -553,26 +559,37 @@ And emojis! :ok_hand: :100:</textarea>
 				// Return the modified HTML
 				return doc;
 			}
-			async function downloadJson() {
+			async function downloadJson(view = false) {
 				var json = document.makeJson();
-				const blob = new Blob([json], {
+				createBlob(json, document.title ? document.title + ".json" : "page.json", view);
+			}
+			async function createBlob(content, filename, view = false) {
+				const blob = new Blob([content], {
 					type: "application/json",
 				});
 				// Create a URL for the Blob
 				const url = URL.createObjectURL(blob);
-				// Create a temporary link to trigger the download
-				const link = document.createElement("a");
-				link.href = url;
-				link.download = document.title ? document.title + ".json" : "page.json";
-				document.body.appendChild(link);
-				link.click();
+				if(!view) {
+					// Create a temporary link to trigger the download
+					const link = document.createElement("a");
+					link.href = url;
+					link.download = filename;
+					document.body.appendChild(link);
+					link.click();
+					// Clean up
+					setTimeout(() => {
+						document.body.removeChild(link);
+					}, 100);
+				} else {
+					// Open in a new tab
+					window.open(url, "_blank");
+				}
 				// Clean up
 				setTimeout(() => {
-					document.body.removeChild(link);
 					URL.revokeObjectURL(url);
 				}, 100);
 			}
-			async function downloadCurrentPageAsHTML() {
+			async function downloadCurrentPageAsHTML(view = false) {
 				var json = document.makeJson();
 				// Clone the current document to avoid modifying the live DOM
 				let documentClone = document.cloneNode(true);
@@ -589,22 +606,7 @@ And emojis! :ok_hand: :100:</textarea>
 				const htmlElement = documentClone.documentElement;
 				var htmlContent = "<!DOCTYPE html>\n" + htmlElement.outerHTML;
 				htmlContent += "<!--Editor JSON values for possible reimport:" + json + "-->";
-				const blob = new Blob([htmlContent], {
-					type: "text/html",
-				});
-				// Create a URL for the Blob
-				const url = URL.createObjectURL(blob);
-				// Create a temporary link to trigger the download
-				const link = document.createElement("a");
-				link.href = url;
-				link.download = document.title ? document.title + ".html" : "page.html";
-				document.body.appendChild(link);
-				link.click();
-				// Clean up
-				setTimeout(() => {
-					document.body.removeChild(link);
-					URL.revokeObjectURL(url);
-				}, 100);
+				createBlob(htmlContent, document.title ? document.title + ".html" : "page.html", view);
 			}
 		</script>
 		<script type="module" class="editorOnly">
@@ -613,8 +615,34 @@ And emojis! :ok_hand: :100:</textarea>
 			import extendedTables from "https://cdn.jsdelivr.net/gh/calculuschild/marked-extended-tables/src/index.js";
 			import markedMoreLists from "https://cdn.jsdelivr.net/npm/marked-more-lists/src/index.js";
 			import { baseUrl } from "https://cdn.jsdelivr.net/npm/marked-base-url/src/index.js";
-			import { emojify } from "https://esm.sh/node-emoji";
-			import twemoji from "https://esm.sh/twemoji";
+			import { emojify, which } from "https://cdn.skypack.dev/node-emoji";
+			import twemoji from "https://cdn.skypack.dev/twemoji";
+
+			document.whichEmoji = which;
+
+			const iconPacks = [
+				{
+					"prefix": "@",
+					"name": "bootstrap-icons",
+					"html": (icon) => `<img src="https://unpkg.com/bootstrap-icons/icons/${icon}.svg" class="whiten">`,
+				},
+				{
+					"prefix": "!",
+					"name": "font-awesome-free",
+					"html": (icon) => `<img src="https://unpkg.com/@fortawesome/fontawesome-free@latest/svgs/${icon}.svg" class="whiten">`,
+				},
+				{
+					"prefix": "+",
+					"name": "simpleicons",
+					"html": (icon) => `<img src="https://cdn.simpleicons.org/${icon}/white">`,
+				}
+			];
+			const emojiOverrides = {
+				"thumbs_up": "+1",
+				"thumbsup": "+1",
+				"thumbs_down": "-1",
+				"thumbsdown": "-1"
+			};
 
 			let markedInst = null;
 			document.makeJson = function () {
@@ -670,9 +698,30 @@ And emojis! :ok_hand: :100:</textarea>
 					c++;
 				}
 			};
+			function applyOverrides(text) {
+				if (!text) return text;
+				for (const [key, value] of Object.entries(emojiOverrides)) {
+					text = text.replace(new RegExp(":" + key + ":", "g"), ":" + value + ":");
+				}
+				return text;
+			};
+			document.emojiParse = function(text) {
+				return twemoji.parse(emojify(applyOverrides(text)), { base: "https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/" });
+			}
 			document.parse = function (text) {
 				if (!markedInst) return text;
-				return twemoji.parse(markedInst.parse(emojify(text)), { base: "https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/" });
+				let str = markedInst.parse(text);
+				let matches = str.match(/:[^\s]+:/g);
+				if (matches) {
+					for (const match of matches) {
+						const iconSlug = match.slice(1, -1);
+						const iconHtml = resolveIcon(iconSlug, true);
+						if (iconHtml) {
+							str = str.replace(match, iconHtml);
+						}
+					}
+				}
+				return str;
 			};
 			document.handleSpoiler = function (button) {
 				var sib = button.nextElementSibling;
@@ -685,6 +734,31 @@ And emojis! :ok_hand: :100:</textarea>
 					button.innerHTML = "&#x25B6; More Options"; // Right arrow
 				}
 			};
+
+			function resolveIcon(slug, emoji = false, forcePrefix = false) {
+				let emojiForm = ":" + slug + ":";
+				let emojiText = document.emojiParse(emojiForm);
+				console.log(emojiText);
+				if (emojiText != emojiForm)
+					return emojiText;
+				console.log("Resolving icon for slug: " + slug);
+				if(forcePrefix) {
+					let hasPrefix = iconPacks.some(pack => slug.startsWith(pack.prefix));
+					if (!hasPrefix)
+						slug = "+" + slug; // Default to bootstrap-icons if no prefix is found
+				}
+				for (const pack of iconPacks) {
+					if (slug.startsWith(pack.prefix)) {
+						const iconName = slug.slice(pack.prefix.length);
+						let html = pack.html(iconName);
+						let node = document.htmlToNode(html);
+						if (emoji) {
+							node.querySelector("img").classList.add("emoji");
+						}
+						return document.nodeToHtml(node);
+					}
+				}
+			}
 
 			function getTemplateBase(uniqueId) {
 				return document.getElementById("template-base").innerHTML.replaceAll("{id}", "'" + uniqueId + "-right" + "'");
@@ -752,8 +826,7 @@ And emojis! :ok_hand: :100:</textarea>
 					el2.appendChild(newEl);
 					let newEl2 = document.createElement("div");
 					newEl2.className = "action";
-					newEl2.innerHTML = '<img src="https://cdn.simpleicons.org/' + slug + '/white">';
-					if (slug.startsWith("@")) newEl2.innerHTML = '<img src="https://unpkg.com/bootstrap-icons/icons/' + slug.substring(1) + '.svg" class="whiten">';
+					newEl2.innerHTML = resolveIcon(slug, false, true) || slug;
 					newEl2.style.backgroundColor = color;
 					let newEl3 = document.createElement("div");
 					newEl3.innerHTML = text;
@@ -766,6 +839,11 @@ And emojis! :ok_hand: :100:</textarea>
 				template.innerHTML = html;
 				return template.content;
 			};
+			document.nodeToHtml = function (node) {
+				var div = document.createElement("div");
+				div.appendChild(node);
+				return div.innerHTML;
+			}
 			document.addEventListener("DOMContentLoaded", function () {
 				markedInst = setupMarked();
 
@@ -786,7 +864,8 @@ And emojis! :ok_hand: :100:</textarea>
 					leftElement.id = uniqueId + "-left";
 					leftElement.innerHTML = getTemplateBase(uniqueId);
 					leftElement.setAttribute("data-pair-id", uniqueId);
-					leftElement.draggable = true;
+					leftElement.querySelector(".grabber").draggable = true;
+					leftElement.querySelectorAll("input, textarea").forEach(x => x.draggable = false);
 
 					// Create right column element
 					const rightElement = document.createElement("div");
@@ -800,11 +879,20 @@ And emojis! :ok_hand: :100:</textarea>
 					rightColumn.insertBefore(rightElement, footer);
 
 					// Set up drag events for the new element
-					setupDragEvents(leftElement);
+					setupDragEvents(leftElement.querySelector(".grabber"));
 					updateTypeSelect(leftElement.querySelector("select"));
 					return leftElement;
 				}
+				function deleteColElement(element) {
+					const pairId = element.getAttribute("data-pair-id");
+					const rightElement = document.getElementById(pairId + "-right");
+					if (rightElement) {
+						rightElement.parentElement.removeChild(rightElement);
+					}
+					element.parentElement.removeChild(element);
+				}
 				document.createColElement = createColElement;
+				document.deleteColElement = deleteColElement;
 				addButton.addEventListener("click", createColElement);
 
 				// Set up column event listeners for drag and drop
@@ -820,8 +908,8 @@ And emojis! :ok_hand: :100:</textarea>
 				}
 
 				function handleDragStart(e) {
-					draggedElement = this;
-					this.classList.add("dragging");
+					draggedElement = this.parentElement;
+					this.parentElement.classList.add("dragging");
 
 					// Required for Firefox
 					e.dataTransfer.effectAllowed = "move";
@@ -829,7 +917,7 @@ And emojis! :ok_hand: :100:</textarea>
 				}
 
 				function handleDragEnd(e) {
-					this.classList.remove("dragging");
+					this.parentElement.classList.remove("dragging");
 					draggedElement = null;
 				}
 
