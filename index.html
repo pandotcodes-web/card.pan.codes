@@ -822,8 +822,14 @@ And emojis! :ok_hand: :100:</textarea>
 					}
 					let newEl = document.createElement("a");
 					newEl.className = "action-wrapper";
+					let noTarget = false;
+					if(link.startsWith("@")) {
+						noTarget = true;
+						link = link.slice(1);
+					}
 					if (link.length > 0) newEl.href = link;
-					newEl.target = "_blank";
+					if(!noTarget)
+						newEl.target = "_blank";
 					el2.appendChild(newEl);
 					let newEl2 = document.createElement("div");
 					newEl2.className = "action";
