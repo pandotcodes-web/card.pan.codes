@@ -534,6 +534,7 @@ And emojis! :ok_hand: :100:</textarea>
 								if (img.hasAttribute("class")) svgElement.setAttribute("class", img.getAttribute("class"));
 								if (img.hasAttribute("id")) svgElement.setAttribute("id", img.getAttribute("id"));
 								if (img.hasAttribute("alt")) svgElement.setAttribute("aria-label", img.getAttribute("alt"));
+								svgElement.classList.remove("whiten");
 								// Replace img with svg
 								img.parentNode.replaceChild(svgElement, img);
 							}
