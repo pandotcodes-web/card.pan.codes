@@ -18,6 +18,7 @@
 			display: flex;
 			justify-content: center;
 			background-color: #333333;
+			transition: all 0.3s;
 		}
 
 		.container {
@@ -54,6 +55,10 @@
 			color: black;
 			border: 5px dashed #ff8000;
 			background-color: #333333;
+		}
+		body.light-mode .add-button {
+			background-color: #aaaaaf;
+			color: black;
 		}
 
 		.download-button {
@@ -105,6 +110,10 @@
 			border-left: 4px solid #ff0000;
 			position: relative;
 		}
+		body.light-mode .left-element {
+			background-color: #ffffff;
+			color: black;
+		}
 
 		.left-element:has(.add-button),
 		.left-element:has(.download-button) {
@@ -142,6 +151,7 @@
 			border-radius: 20px;
 			transition: all 0.3s;
 			grid-area: span 1 / span 2;
+			cursor: pointer;
 		}
 
 		.switch::after {
@@ -194,11 +204,19 @@
 			margin: 0 auto;
 			position: relative;
 		}
+		body.light-mode .column {
+			background-color: #aaaaaf;
+			color: black;
+		}
 
 		.element {
 			padding: 15px;
 			background-color: black;
 			color: white;
+		}
+		body.light-mode .element {
+			background-color: white;
+			color: black;
 		}
 
 		.right-element {
@@ -230,6 +248,13 @@
 			width: calc(100%);
 			min-height: 1.5em;
 			font-family: Arial;
+		}
+		body.light-mode input,
+		body.light-mode select,
+		body.light-mode textarea,
+		body.light-mode .content-box {
+			background-color: #aaaaaf;
+			color: black;
 		}
 
 		input[type="color"] {
@@ -284,7 +309,7 @@
 
 		a {
 			text-decoration: none;
-			color: white;
+			color: inherit;
 		}
 
 		.flex-container {
@@ -393,9 +418,9 @@
 						<option value="center" selected>Center</option>
 						<option value="right">Right</option>
 					</select>
-					Background Color: <input type="color"
+					Background Color: <input class="elementBg" type="color"
 						oninput="document.getElementById({id}).style.backgroundColor = this.value;" /> Text Color:
-					<input type="color" value="#ffffff"
+					<input class="elementFg" type="color" value="#ffffff"
 						oninput="document.getElementById({id}).style.color = this.value;" /> Height:
 					<input placeholder="Height in Pixels - 0 for Auto" value="0"
 						oninput="document.getElementById({id}).style.height=this.value=='0'?'auto':this.value + 'px';" />
@@ -497,7 +522,7 @@ And emojis! :ok_hand: :100:</textarea>
 			<div class="element left-element sticky-element" id="globals">
 				<div class="three-col">
 					Site Title: <input oninput="document.title=this.value;" />
-					Site Background: <input type="color" oninput="document.body.style.backgroundColor=this.value;"
+					Site Background: <input type="color" id="sitebg" oninput="document.body.style.backgroundColor=this.value;"
 						value="#333333">
 					Include Footer: <input type="checkbox" class="checkbox" id="toggle1" checked
 						oninput="document.getElementById('footer').style.display=this.checked?'block':'none';">
@@ -511,6 +536,9 @@ And emojis! :ok_hand: :100:</textarea>
 					<div id="qr2" class="three-col">QR Code URL: <input
 							oninput="document.getElementById('qr-modal').querySelector('img').src='https://quickchart.io/qr?text='+encodeURIComponent(this.value)+'&format=svg&margin=0';">
 					</div>
+					Light Mode: <input type="checkbox" class="checkbox" id="toggle4"
+						oninput="document.toggleLightMode(this.checked);">
+						<label for="toggle4" class="switch"></label>
 				</div>
 			</div>
 			<div class="element left-element sticky-element">
@@ -1198,6 +1226,59 @@ And emojis! :ok_hand: :100:</textarea>
 			function setupMarked() {
 				let markedInstance = new Marked({ breaks: true }, customHeadingId(), extendedTables(), markedMoreLists(), baseUrl("https://example.com/folder/"));
 				return markedInstance;
+			}
+			const colorSwitchElements = [
+				{
+					selector: "#sitebg",
+					defaultDark: "#333333",
+					defaultLight: "#dddddd",
+					propertyName: "value"
+				},
+				{
+					selector: ".elementBg",
+					defaultDark: "#000000",
+					defaultLight: "#ffffff",
+					propertyName: "value"
+				},
+				{
+					selector: ".elementFg",
+					defaultDark: "#ffffff",
+					defaultLight: "#000000",
+					propertyName: "value"
+				},
+				{
+					selector: "#qr > img",
+					defaultDark: "whiten",
+					defaultLight: "",
+					propertyName: "className"
+				},
+				{
+					selector: "#share > img",
+					defaultDark: "whiten",
+					defaultLight: "",
+					propertyName: "className"
+				},
+			];
+			const rgba2hex = (rgba) => !rgba.startsWith("rgb") ? rgba : `#${rgba.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+\.{0,1}\d*))?\)$/).slice(1).map((n, i) => (i === 3 ? Math.round(parseFloat(n) * 255) : parseFloat(n)).toString(16).padStart(2, '0').replace('NaN', '')).join('')}`
+			document.toggleLightMode = function (isLight) {
+				document.body.classList.toggle("light-mode", isLight);
+				colorSwitchElements.forEach(el => {
+					document.querySelectorAll(el.selector).forEach(node => {
+						let node2 = node;
+						let prop = el.propertyName;
+						if(prop.startsWith("style.")) {
+							prop = prop.slice(6); // Remove "style." prefix
+							node2 = node.style;
+						}
+						if (isLight && (rgba2hex(node2[prop]) === el.defaultDark || !node2[prop])) {
+							node2[prop] = el.defaultLight;
+						} else if (!isLight && (rgba2hex(node2[prop]) === el.defaultLight || !node2[prop])) {
+							node2[prop] = el.defaultDark;
+						}
+						node.dispatchEvent(new Event("input"));
+						node.dispatchEvent(new Event("change"));
+					});
+				});
 			}
 		});
 	</script>
