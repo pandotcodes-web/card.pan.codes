@@ -843,7 +843,8 @@ And emojis! :ok_hand: :100:</textarea>
 			"thumbs_up": "+1",
 			"thumbsup": "+1",
 			"thumbs_down": "-1",
-			"thumbsdown": "-1"
+			"thumbsdown": "-1",
+			"x": "+x"
 		};
 
 		let markedInst = null;
@@ -939,6 +940,9 @@ And emojis! :ok_hand: :100:</textarea>
 
 		function resolveIcon(slug, emoji = false, forcePrefix = false) {
 			let emojiForm = ":" + slug + ":";
+			if (emojiOverrides[slug]) {
+				emojiForm = ":" + emojiOverrides[slug] + ":";
+			}
 			let emojiText = document.emojiParse(emojiForm);
 			console.log(emojiText);
 			if (emojiText != emojiForm)
