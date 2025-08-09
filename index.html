@@ -387,6 +387,9 @@
 			height: unset;
 			margin: 10%;
 		}
+		#footer a {
+			text-decoration: underline;
+		}
 	</style>
 </head>
 
@@ -529,8 +532,10 @@ And emojis! :ok_hand: :100:</textarea>
 					Site Background: <input type="color" id="sitebg" oninput="document.body.style.backgroundColor=this.value;"
 						value="#333333">
 					Include Footer: <input type="checkbox" class="checkbox" id="toggle1" checked
-						oninput="document.getElementById('footer').style.display=this.checked?'block':'none';">
+						oninput="document.getElementById('footer').style.display=this.checked?'block':'none';document.getElementById('footer2').style.display=this.checked?'grid':'none';">
 					<label for="toggle1" class="switch"></label>
+					<div id="footer2" class="three-col">Footer Text: <input class="compat" name="footerText"
+						oninput="document.getElementById('footer').innerHTML=parseFooter(this.value);" value="Made with [card.pan.codes](https://card.pan.codes/)"></div>
 					Include Share Button: <input type="checkbox" class="checkbox" id="toggle2" checked
 						oninput="document.getElementById('share').style.display=this.checked?'block':'none';">
 					<label for="toggle2" class="switch"></label>
@@ -583,7 +588,7 @@ And emojis! :ok_hand: :100:</textarea>
 		</div>
 		<div class="column" id="right-column">
 			<div class="element right-element sticky-element" id="footer">
-				Made with <a href="https://card.pan.codes/" target="_blank"><u>card.pan.codes</u></a>
+				Made with <a href="https://card.pan.codes/" target="_blank">card.pan.codes</a>
 			</div>
 			<div class="cornerbuttons">
 				<div id="qr" onclick="document.getElementById('qr-modal').style.display='block';">
@@ -887,16 +892,29 @@ And emojis! :ok_hand: :100:</textarea>
 				var arr2 = [];
 				var inputs = el.querySelectorAll("input, textarea, select");
 				for (var input of inputs) {
+					let value = null;
 					if (input.type == "checkbox")
-						arr2.push(input.checked);
+						value = input.checked;
 					else
-						arr2.push(input.value);
+						value = input.value;
+					if (input.classList.contains("compat")) {
+						value = "+compat_"+input.name+"="+value;
+					}
+					arr2.push(value);
 				}
 				arr.push(arr2);
 			}
 			return JSON.stringify(arr);
 		};
 		document.importJson = function (json) {
+			function setValue(input, value) {
+				if (input.type == "checkbox")
+					input.checked = value;
+				else
+					input.value = value;
+				input.dispatchEvent(new Event("input"));
+				input.dispatchEvent(new Event("change"));
+			}
 			console.log("importing: " + json);
 			if (json.startsWith("http")) {
 				var html = httpGet("https://corsproxy.io/?url=" + encodeURIComponent(json));
@@ -917,17 +935,25 @@ And emojis! :ok_hand: :100:</textarea>
 				}
 				let i = 0;
 				for (var input of el) {
+					if(input.toString().startsWith("+compat_")) {
+						let name = input.toString().split("=")[0].substring(8);
+						input = input.toString().split("=")[1];
+						if (left.querySelector(".compat[name='" + name + "']")) {
+							setValue(left.querySelector(".compat[name='" + name + "']"), input);
+							continue;
+						}
+					}
 					var inputAtIndex = left.querySelectorAll("input, textarea, select")[i];
 					if (!inputAtIndex) {
 						left.querySelector(".adder").click();
 						inputAtIndex = left.querySelectorAll("input, textarea, select")[i];
 					}
-					if (inputAtIndex.type == "checkbox")
-						inputAtIndex.checked = input;
-					else
-						inputAtIndex.value = input;
-					inputAtIndex.dispatchEvent(new Event("input"));
-					inputAtIndex.dispatchEvent(new Event("change"));
+					while(inputAtIndex.classList.contains("compat")) {
+						i++;
+						inputAtIndex = left.querySelectorAll("input, textarea, select")[i];
+						continue;
+					}
+					setValue(inputAtIndex, input);
 					i++;
 				}
 				c++;
@@ -942,6 +968,12 @@ And emojis! :ok_hand: :100:</textarea>
 		};
 		document.emojiParse = function (text) {
 			return twemoji.parse(emojify(applyOverrides(text)), { base: "https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/" });
+		}
+		document.parseFooter = function (text) {
+			text = document.parse(text);
+			text = text.substring(3, text.length - 5);
+			text = text.replaceAll("<a", "<a target='_blank'");
+			return text;
 		}
 		document.parse = function (text) {
 			if (!markedInst) return text;
